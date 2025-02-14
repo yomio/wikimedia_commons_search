@@ -1,0 +1,31 @@
+name: wikimedia_commons_search
+description: A Dart library for searching and retrieving articles and images from Wikipedia / Wikimedia Commons
+version: 1.0.0
+homepage: https://github.com/Yomio/wikimedia_commons_search
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  http: ^1.3.0
+  equatable: ^2.0.0
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.24.0
+
+# Test configuration
+targets:
+  $default:
+    sources:
+      include:
+        - test/**
+        - lib/**
+        - $package$
+    tests:
+      $default:
+        exclude:
+          - test/**_integration_test.dart
+      integration_test:
+        include:
+          - test/**_integration_test.dart 
