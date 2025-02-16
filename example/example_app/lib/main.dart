@@ -97,7 +97,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildTopicChips() {
-    if (_searchResults == null || _searchResults!.isEmpty) return const SizedBox.shrink();
+    if (_searchResults == null || _searchResults!.isEmpty)
+      return const SizedBox.shrink();
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,

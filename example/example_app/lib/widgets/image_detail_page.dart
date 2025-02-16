@@ -30,7 +30,8 @@ class _ImageDetailPageState extends State<ImageDetailPage> {
 
   Future<void> _loadImageDetails() async {
     try {
-      final details = await widget.search.api.getImageInfo(widget.image.fullTitle);
+      final details =
+          await widget.search.api.getImageInfo(widget.image.fullTitle);
       if (mounted && details != null) {
         setState(() {
           _imageDetails = details;
@@ -156,7 +157,8 @@ class _ImageDetailPageState extends State<ImageDetailPage> {
                           child: Image.network(
                             _imageDetails!.url!,
                             fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) => Column(
+                            errorBuilder: (context, error, stackTrace) =>
+                                Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
@@ -172,8 +174,10 @@ class _ImageDetailPageState extends State<ImageDetailPage> {
                               if (loadingProgress == null) return child;
                               return Center(
                                 child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                  value: loadingProgress.expectedTotalBytes !=
+                                          null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
                                       : null,
                                 ),
                               );
@@ -189,15 +193,19 @@ class _ImageDetailPageState extends State<ImageDetailPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           _buildMetadata(context, 'From', widget.topic.title),
-                          _buildMetadata(context, 'Description', _imageDetails!.description),
-                          _buildMetadata(context, 'License', _imageDetails!.license),
-                          _buildMetadata(context, 'Attribution', _imageDetails!.attribution),
+                          _buildMetadata(context, 'Description',
+                              _imageDetails!.description),
+                          _buildMetadata(
+                              context, 'License', _imageDetails!.license),
+                          _buildMetadata(context, 'Attribution',
+                              _imageDetails!.attribution),
                           _buildMetadata(
                             context,
                             'Size',
                             '${_imageDetails!.width} × ${_imageDetails!.height} pixels',
                           ),
-                          _buildMetadata(context, 'Type', _imageDetails!.mimeType),
+                          _buildMetadata(
+                              context, 'Type', _imageDetails!.mimeType),
                         ],
                       ),
                     ),
