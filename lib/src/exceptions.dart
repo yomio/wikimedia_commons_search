@@ -1,22 +1,18 @@
 /// Custom exceptions for the Wikimedia Commons Search library.
 library;
 
-/// Base exception class for all Wikimedia Commons Search related errors.
-class WikimediaCommonsException implements Exception {
-  /// Creates a new [WikimediaCommonsException].
-  const WikimediaCommonsException(this.message);
-
-  /// The error message.
+/// Base exception class for all Wikimedia Commons related errors
+abstract class WikimediaCommonsException implements Exception {
+  WikimediaCommonsException(this.message);
   final String message;
-
   @override
-  String toString() => 'WikimediaCommonsException: $message';
+  String toString() => message;
 }
 
-/// Thrown when an API request fails.
+/// Thrown when the API request fails
 class WikimediaApiException extends WikimediaCommonsException {
   /// Creates a new [WikimediaApiException].
-  const WikimediaApiException(
+  WikimediaApiException(
     super.message, {
     this.statusCode,
     this.endpoint,
@@ -30,27 +26,31 @@ class WikimediaApiException extends WikimediaCommonsException {
 
   @override
   String toString() {
-    final parts = <String>['WikimediaApiException: $message'];
+    final parts = <String>[message];
     if (statusCode != null) parts.add('Status code: $statusCode');
     if (endpoint != null) parts.add('Endpoint: $endpoint');
     return parts.join(', ');
   }
 }
 
-/// Thrown when no results are found for a search query.
-class NoResultsException extends WikimediaCommonsException {
-  /// Creates a new [NoResultsException].
-  const NoResultsException([String? message]) : super(message ?? 'No results found for the given query');
+/// Thrown when no results are found for a search query
+class WikimediaNoResultsException extends WikimediaCommonsException {
+  WikimediaNoResultsException(super.message);
+}
+
+/// Thrown when no images are found for a topic
+class WikimediaNoImagesException extends WikimediaCommonsException {
+  WikimediaNoImagesException(super.message);
 }
 
 /// Thrown when there's an issue with parsing the API response.
 class ResponseParsingException extends WikimediaCommonsException {
   /// Creates a new [ResponseParsingException].
-  const ResponseParsingException([String? message]) : super(message ?? 'Failed to parse API response');
+  ResponseParsingException([String? message]) : super(message ?? 'Failed to parse API response');
 }
 
 /// Thrown when trying to use a disposed instance.
 class DisposedException extends WikimediaCommonsException {
   /// Creates a new [DisposedException].
-  const DisposedException([String? message]) : super(message ?? 'Instance has been disposed and cannot be used');
+  DisposedException([String? message]) : super(message ?? 'Instance has been disposed and cannot be used');
 }

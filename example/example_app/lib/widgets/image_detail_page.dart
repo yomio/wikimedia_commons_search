@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wikimedia_commons_search/wikimedia_commons_search.dart';
-import 'package:wikimedia_commons_search/src/models/topic.dart';
-import 'package:wikimedia_commons_search/src/models/commons_image.dart';
 
 class ImageDetailPage extends StatefulWidget {
   final CommonsImage image;
@@ -148,67 +146,62 @@ class _ImageDetailPageState extends State<ImageDetailPage> {
           ? _buildError()
           : _imageDetails == null
               ? _buildLoading()
-              : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AspectRatio(
-                        aspectRatio: (_imageDetails!.width ?? 1) / (_imageDetails!.height ?? 1),
-                        child: Image.network(
-                          _imageDetails!.url!,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: Colors.grey.shade200,
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.error_outline,
-                                    size: 48,
-                                    color: Colors.grey.shade400,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  const Text('Failed to load image'),
-                                ],
-                              ),
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        color: Colors.grey.shade200,
+                        child: Center(
+                          child: Image.network(
+                            _imageDetails!.url!,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) => Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  size: 48,
+                                  color: Colors.grey.shade400,
+                                ),
+                                const SizedBox(height: 16),
+                                const Text('Failed to load image'),
+                              ],
                             ),
-                          ),
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: Colors.grey.shade200,
-                              child: Center(
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
                                 child: CircularProgressIndicator(
                                   value: loadingProgress.expectedTotalBytes != null
                                       ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                                       : null,
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildMetadata(context, 'From', widget.topic.title),
-                            _buildMetadata(context, 'Description', _imageDetails!.description),
-                            _buildMetadata(context, 'License', _imageDetails!.license),
-                            _buildMetadata(context, 'Attribution', _imageDetails!.attribution),
-                            _buildMetadata(
-                              context,
-                              'Size',
-                              '${_imageDetails!.width} × ${_imageDetails!.height} pixels',
-                            ),
-                            _buildMetadata(context, 'Type', _imageDetails!.mimeType),
-                          ],
-                        ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildMetadata(context, 'From', widget.topic.title),
+                          _buildMetadata(context, 'Description', _imageDetails!.description),
+                          _buildMetadata(context, 'License', _imageDetails!.license),
+                          _buildMetadata(context, 'Attribution', _imageDetails!.attribution),
+                          _buildMetadata(
+                            context,
+                            'Size',
+                            '${_imageDetails!.width} × ${_imageDetails!.height} pixels',
+                          ),
+                          _buildMetadata(context, 'Type', _imageDetails!.mimeType),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
     );
   }

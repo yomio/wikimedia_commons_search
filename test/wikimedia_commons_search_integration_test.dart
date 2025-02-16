@@ -91,7 +91,7 @@ void main() {
     }, timeout: Timeout(Duration(seconds: 60))); // Longer timeout as it makes multiple API calls
 
     test('searchAndGetImages combines search and image retrieval', () async {
-      final images = await search.searchAndGetImages('Eiffel Tower');
+      final images = await search.searchImages('Eiffel Tower');
 
       expect(images, isNotEmpty, reason: 'Should find at least one image');
 
@@ -139,7 +139,7 @@ void main() {
       // Test with invalid page ID
       expect(
         () => search.getTopicImages('-1'),
-        throwsA(isA<NoResultsException>().having(
+        throwsA(isA<WikimediaNoResultsException>().having(
           (e) => e.message,
           'message',
           'No images found for the given topic',

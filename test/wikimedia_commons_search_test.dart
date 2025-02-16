@@ -26,10 +26,10 @@ void main() {
       expect(topics.first.description, contains('wrought-iron lattice tower'));
     });
 
-    test('searchTopics throws NoResultsException for non-existent query', () async {
+    test('searchTopics throws WikimediaNoResultsException for non-existent query', () async {
       expect(
         () => search.searchTopics('xyznonexistentquery123'),
-        throwsA(isA<NoResultsException>()),
+        throwsA(isA<WikimediaNoResultsException>()),
       );
     });
 
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('searchAndGetImages returns images for valid query', () async {
-      final images = await search.searchAndGetImages('Eiffel Tower');
+      final images = await search.searchImages('Eiffel Tower');
 
       expect(images, isNotEmpty);
       expect(images.first.title, 'Eiffel Tower.jpg');
@@ -57,10 +57,10 @@ void main() {
       expect(images.first.thumbUrl, isNotEmpty);
     });
 
-    test('searchAndGetImages throws NoResultsException for non-existent query', () async {
+    test('searchAndGetImages throws WikimediaNoResultsException for non-existent query', () async {
       expect(
-        () => search.searchAndGetImages('xyznonexistentquery123'),
-        throwsA(isA<NoResultsException>()),
+        () => search.searchImages('xyznonexistentquery123'),
+        throwsA(isA<WikimediaNoResultsException>()),
       );
     });
 
@@ -79,7 +79,7 @@ void main() {
       expect(WikimediaCommonsSearch, isNotNull);
       expect(WikimediaCommonsException, isNotNull);
       expect(WikimediaApiException, isNotNull);
-      expect(NoResultsException, isNotNull);
+      expect(WikimediaNoResultsException, isNotNull);
       expect(ResponseParsingException, isNotNull);
       expect(DisposedException, isNotNull);
 

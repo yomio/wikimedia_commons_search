@@ -31,7 +31,7 @@ class WikimediaApiWrapper {
 
   void _checkDisposed() {
     if (_isDisposed) {
-      throw const DisposedException();
+      throw DisposedException();
     }
   }
 
@@ -70,12 +70,12 @@ class WikimediaApiWrapper {
       final data = json.decode(response.body) as Map<String, dynamic>;
 
       if (data['query'] == null || data['query']['search'] == null) {
-        throw const ResponseParsingException('Invalid API response format: missing query.search');
+        throw ResponseParsingException('Invalid API response format: missing query.search');
       }
 
       final searchResults = data['query']['search'] as List;
       if (searchResults.isEmpty) {
-        throw NoResultsException('No topics found for keyword: $keyword');
+        throw WikimediaNoResultsException('No topics found for keyword: $keyword');
       }
 
       return searchResults.map((result) {
@@ -131,7 +131,7 @@ class WikimediaApiWrapper {
 
       final data = json.decode(response.body) as Map<String, dynamic>;
       if (data['query'] == null || data['query']['pages'] == null) {
-        throw const NoResultsException('No images found for the given topic');
+        throw WikimediaNoResultsException('No images found for the given topic');
       }
 
       final pages = data['query']['pages'] as Map<String, dynamic>;
@@ -165,7 +165,7 @@ class WikimediaApiWrapper {
       }
 
       if (images.isEmpty) {
-        throw const NoResultsException('No suitable images found for the given topic');
+        throw WikimediaNoResultsException('No suitable images found for the given topic');
       }
 
       // Sort by priority (non-SVG before SVG, larger files first)
@@ -218,7 +218,7 @@ class WikimediaApiWrapper {
 
       final data = json.decode(response.body) as Map<String, dynamic>;
       if (data['query']?['pages'] == null) {
-        throw const ResponseParsingException('Invalid API response format: missing query.pages');
+        throw ResponseParsingException('Invalid API response format: missing query.pages');
       }
 
       final pages = data['query']['pages'] as Map<String, dynamic>;
@@ -226,7 +226,7 @@ class WikimediaApiWrapper {
       final imageInfo = page['imageinfo'] as List?;
 
       if (imageInfo == null || imageInfo.isEmpty) {
-        throw NoResultsException('No image info found for: $imageTitle');
+        throw WikimediaNoResultsException('No image info found for: $imageTitle');
       }
 
       final info = imageInfo.first as Map<String, dynamic>;
@@ -287,7 +287,7 @@ class WikimediaApiWrapper {
 
       final data = json.decode(response.body) as Map<String, dynamic>;
       if (data['query'] == null || data['query']['pages'] == null) {
-        throw NoResultsException('No images found for keyword: $keyword');
+        throw WikimediaNoResultsException('No images found for keyword: $keyword');
       }
 
       final pages = data['query']['pages'] as Map<String, dynamic>;
@@ -322,7 +322,7 @@ class WikimediaApiWrapper {
       }
 
       if (result.isEmpty) {
-        throw NoResultsException('No suitable images found for keyword: $keyword');
+        throw WikimediaNoResultsException('No suitable images found for keyword: $keyword');
       }
 
       // Sort by priority (content images first, utility images last)

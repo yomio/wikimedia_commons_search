@@ -10,7 +10,7 @@ import 'exceptions.dart';
 /// This class serves as the main entry point for the library, offering methods to:
 /// - Search Wikipedia topics by keywords
 /// - Retrieve images associated with specific topics
-/// - Combine topic search and image retrieval in a single operation
+/// - Search for images directly
 ///
 /// Example usage:
 /// ```dart
@@ -20,7 +20,7 @@ import 'exceptions.dart';
 /// try {
 ///   final topics = await search.searchTopics('Eiffel Tower');
 ///   // Handle topics...
-/// } on NoResultsException catch (e) {
+/// } on WikimediaNoResultsException catch (e) {
 ///   print('No topics found: ${e.message}');
 /// } on WikimediaApiException catch (e) {
 ///   print('API error: ${e.message}');
@@ -30,13 +30,13 @@ import 'exceptions.dart';
 /// try {
 ///   final images = await search.getTopicImages(topics.first.id);
 ///   // Handle images...
-/// } on NoResultsException catch (e) {
+/// } on WikimediaNoImagesException catch (e) {
 ///   print('No images found: ${e.message}');
 /// }
 ///
-/// // Or use the convenience method to do both in one call
+/// // Or search for images directly
 /// try {
-///   final images = await search.searchAndGetImages('Eiffel Tower');
+///   final images = await search.searchImages('Eiffel Tower');
 ///   // Handle images...
 /// } on WikimediaCommonsException catch (e) {
 ///   print('Error: ${e.message}');
@@ -58,30 +58,37 @@ class WikimediaCommonsSearch {
   /// Gets access to the underlying API wrapper
   WikimediaApiWrapper get api => _api;
 
-  void _checkDisposed() {
-    if (_isDisposed) {
-      throw const DisposedException();
+  /// Searches for Wikipedia topics based on the given keyword.
+  /// Returns a list of topics with their descriptions.
+  ///
+  /// The topics are sorted by relevance and limited to 10 results.
+  /// Each topic includes basic metadata like title, description, word count, and size.
+  ///
+  /// Parameters:
+  ///   - query: The search term to find Wikipedia topics
+  ///
+  /// Throws:
+  /// - [WikimediaNoResultsException] if no topics are found for the query
+  /// - [WikimediaApiException] if the API request fails or for general errors
+  /// - [ResponseParsingException] if the API response cannot be parsed
+  /// - [DisposedException] if the instance has been disposed
+  Future<List<Topic>> searchTopics(String query) async {
+    try {
+      return await _api.searchTopics(query);
+    } catch (e) {
+      if (e is WikimediaCommonsException) rethrow;
+      throw WikimediaApiException('Failed to search topics: $e');
     }
   }
 
-  /// Searches for Wikipedia topics based on the given keyword
-  /// Returns a list of topics with their descriptions
+  /// Gets all images linked to a specific Wikipedia topic.
+  /// Returns a list of images with their metadata.
   ///
-  /// Throws:
-  /// - [NoResultsException] if no topics are found
-  /// - [WikimediaApiException] if the API request fails
-  /// - [ResponseParsingException] if the API response cannot be parsed
-  /// - [DisposedException] if the instance has been disposed
-  Future<List<Topic>> searchTopics(String keyword) async {
-    _checkDisposed();
-    return _api.searchTopics(keyword);
-  }
-
-  /// Gets all images linked to a specific Wikipedia topic
-  /// Returns a list of image URLs and their metadata
+  /// The images are filtered to exclude utility images (flags, icons, logos, etc.)
+  /// and sorted with non-SVG images before SVG images, and larger files first.
   ///
   /// Each image contains:
-  /// - title: The image title
+  /// - title: The image title without 'File:' prefix
   /// - fullTitle: The full image title including 'File:' prefix
   /// - url: Direct URL to the full image
   /// - thumbUrl: URL to an 800px wide thumbnail (if available)
@@ -92,44 +99,69 @@ class WikimediaCommonsSearch {
   /// - license: Image license information (if available)
   /// - attribution: Image attribution information (if available)
   ///
+  /// Parameters:
+  ///   - topicId: The Wikipedia page ID to get images from
+  ///
   /// Throws:
-  /// - [NoResultsException] if no images are found
-  /// - [WikimediaApiException] if the API request fails
+  /// - [WikimediaNoImagesException] if no suitable images are found for the topic
+  /// - [WikimediaApiException] if the API request fails or for general errors
   /// - [ResponseParsingException] if the API response cannot be parsed
   /// - [DisposedException] if the instance has been disposed
   Future<List<CommonsImage>> getTopicImages(String topicId) async {
-    _checkDisposed();
-    return _api.getTopicImages(topicId);
+    try {
+      final images = await _api.getTopicImages(topicId);
+      if (images.isEmpty) {
+        throw WikimediaNoImagesException('No images found for topic: $topicId');
+      }
+      return images;
+    } catch (e) {
+      if (e is WikimediaCommonsException) rethrow;
+      throw WikimediaApiException('Failed to get topic images: $e');
+    }
   }
 
-  /// Searches for topics matching the given keyword and returns images for the first matching topic.
+  /// Searches for images by first finding a matching Wikipedia topic and then
+  /// retrieving its images.
   ///
-  /// This is a convenience method that combines [searchTopics] and [getTopicImages] into a single call.
+  /// This method:
+  /// 1. Searches for topics matching the query
+  /// 2. Takes the first (most relevant) topic
+  /// 3. Retrieves all images from that topic
+  ///
+  /// The returned images are filtered and sorted the same way as in [getTopicImages].
   ///
   /// Parameters:
-  ///   - keyword: The search term to find Wikipedia topics
+  ///   - query: The search term to find Wikipedia topics and their images
   ///
   /// Returns:
-  ///   A list of [CommonsImage] objects associated with the first matching topic.
+  ///   A list of [CommonsImage] objects associated with the most relevant topic.
   ///
   /// Throws:
-  /// - [NoResultsException] if no topics or images are found
-  /// - [WikimediaApiException] if any API request fails
+  /// - [WikimediaNoResultsException] if no topics are found for the query
+  /// - [WikimediaNoImagesException] if no suitable images are found
+  /// - [WikimediaApiException] if any API request fails or for general errors
   /// - [ResponseParsingException] if any API response cannot be parsed
   /// - [DisposedException] if the instance has been disposed
-  Future<List<CommonsImage>> searchAndGetImages(String keyword) async {
-    _checkDisposed();
-    final topics = await searchTopics(keyword);
-    return getTopicImages(topics.first.id);
+  Future<List<CommonsImage>> searchImages(String query) async {
+    try {
+      final topics = await searchTopics(query);
+      if (topics.isEmpty) {
+        throw WikimediaNoResultsException('No topics found for query: $query');
+      }
+      return await getTopicImages(topics.first.id);
+    } catch (e) {
+      if (e is WikimediaCommonsException) rethrow;
+      throw WikimediaApiException('Failed to search and get images: $e');
+    }
   }
 
   /// Disposes the HTTP client and frees associated resources.
   ///
   /// This method should be called when the instance is no longer needed to prevent
-  /// resource leaks. After calling dispose, the instance should not be used anymore.
-  /// Calling dispose multiple times has no effect.
-  ///
-  /// After disposal, any attempt to use this instance will throw a [DisposedException].
+  /// resource leaks. After calling dispose:
+  /// - The instance should not be used anymore
+  /// - Any attempt to use this instance will throw a [DisposedException]
+  /// - Calling dispose multiple times has no effect
   void dispose() {
     if (_isDisposed) return;
     _isDisposed = true;

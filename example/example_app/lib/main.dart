@@ -91,7 +91,6 @@ class _SearchScreenState extends State<SearchScreen> {
       MaterialPageRoute(
         builder: (context) => TopicDetailsPage(
           topic: topic,
-          search: _search,
         ),
       ),
     );
