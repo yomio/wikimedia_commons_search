@@ -1,3 +1,6 @@
+@Tags(['integration'])
+library wikimedia_commons_search_integration_test;
+
 import 'package:test/test.dart';
 import 'package:wikimedia_commons_search/wikimedia_commons_search.dart';
 

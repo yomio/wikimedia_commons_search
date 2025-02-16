@@ -30,6 +30,15 @@ dev_dependencies:
   test: ^1.24.0
 
 # Test configuration
+dart_test:
+  tags:
+    integration:
+      timeout: 2x
+      platform: vm
+      presets:
+        - integration
+
+# Test configuration
 targets:
   $default:
     sources:

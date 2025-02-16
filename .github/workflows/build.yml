@@ -1,0 +1,41 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 'stable'
+      
+      - name: Install dependencies
+        run: dart pub get
+      
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+      
+      - name: Analyze project source
+        run: dart analyze
+      
+      - name: Run unit tests
+        run: dart test --exclude-tags=integration
+      
+      - name: Run integration tests
+        run: dart test --tags=integration --timeout=120s
+        
+      - name: Check example app
+        run: |
+          cd example/example_app
+          dart pub get
+          dart analyze 
