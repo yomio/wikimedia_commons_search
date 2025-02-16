@@ -1,7 +1,22 @@
 name: wikimedia_commons_search
 description: A Dart library for searching and retrieving articles and images from Wikipedia / Wikimedia Commons
 version: 1.0.0
-homepage: https://github.com/Yomio/wikimedia_commons_search
+homepage: https://github.com/yomio/wikimedia_commons_search
+repository: https://github.com/yomio/wikimedia_commons_search.git
+issue_tracker: https://github.com/yomio/wikimedia_commons_search/issues
+topics:
+  - http
+  - api
+  - network
+  - search
+  - wikipedia
+screenshots:
+  - description: 'Example Flutter app using the library - search'
+    path: doc/sample0.png
+  - description: 'Example Flutter app using the library - topic details'
+    path: doc/sample1.png
+  - description: 'Example Flutter app using the library - image details'
+    path: doc/sample2.png
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
