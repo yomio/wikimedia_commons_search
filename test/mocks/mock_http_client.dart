@@ -26,7 +26,7 @@ MockClient createMockClient() {
         uri.queryParameters['gsrsearch']?.contains('xyznonexistentquery123') == true) {
       return http.Response(
         jsonEncode({
-          'query': {'search': []}
+          'query': {'search': <Map<String, dynamic>>[]}
         }),
         200,
       );

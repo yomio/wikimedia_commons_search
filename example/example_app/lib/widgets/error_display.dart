@@ -37,10 +37,7 @@ class ErrorDisplay extends StatelessWidget {
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .errorContainer
-                    .withOpacity(0.1),
+                color: Theme.of(context).colorScheme.errorContainer.withAlpha((0.1 * 255).round()),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: Theme.of(context).colorScheme.errorContainer,
@@ -71,8 +68,7 @@ class ErrorDisplay extends StatelessWidget {
                             messenger.clearSnackBars();
                             messenger.showSnackBar(
                               const SnackBar(
-                                content:
-                                    Text('Error message copied to clipboard'),
+                                content: Text('Error message copied to clipboard'),
                                 duration: Duration(seconds: 2),
                               ),
                             );
@@ -86,8 +82,7 @@ class ErrorDisplay extends StatelessWidget {
                     'Check the console for more details',
                     style: TextStyle(
                       fontSize: 12,
-                      color:
-                          Theme.of(context).colorScheme.error.withOpacity(0.8),
+                      color: Theme.of(context).colorScheme.error.withAlpha((0.8 * 255).round()),
                     ),
                   ),
                 ],

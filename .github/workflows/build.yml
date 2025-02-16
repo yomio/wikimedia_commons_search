@@ -33,9 +33,14 @@ jobs:
       
       - name: Run integration tests
         run: dart test --tags=integration --timeout=120s
-        
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      
       - name: Check example app
         run: |
           cd example/example_app
-          dart pub get
-          dart analyze 
+          flutter pub get
+          flutter analyze 
