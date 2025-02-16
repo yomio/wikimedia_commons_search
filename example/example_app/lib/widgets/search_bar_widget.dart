@@ -35,8 +35,7 @@ class SearchBarWidget extends StatelessWidget {
             ),
         ],
         onSubmitted: onSubmitted,
-        padding:
-            const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 16)),
+        padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 16)),
         elevation: const WidgetStatePropertyAll(3),
       ),
     );

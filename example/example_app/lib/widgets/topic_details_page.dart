@@ -66,8 +66,7 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline,
-                        size: 48, color: Colors.red),
+                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
                     const SizedBox(height: 16),
                     Text(
                       snapshot.error.toString(),
@@ -130,8 +129,7 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                             ? Image.network(
                                 image.thumbUrl ?? image.url!,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Center(
+                                errorBuilder: (context, error, stackTrace) => Center(
                                   child: Icon(
                                     Icons.error_outline,
                                     color: Colors.grey.shade400,
