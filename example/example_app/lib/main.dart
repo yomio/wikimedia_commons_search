@@ -35,8 +35,8 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final _searchController = TextEditingController();
-  final _search = WikimediaCommonsSearch();
-  List<Topic>? _searchResults;
+  final _commons = WikimediaCommons(defaultThumbnailHeight: 250);
+  List<WikipediaTopic>? _searchResults;
   List<CommonsImage>? _imageResults;
   bool _isLoading = false;
   String? _error;
@@ -44,7 +44,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void dispose() {
     _searchController.dispose();
-    _search.dispose();
+    _commons.dispose();
     super.dispose();
   }
 
@@ -59,13 +59,13 @@ class _SearchScreenState extends State<SearchScreen> {
     try {
       // Execute both searches in parallel
       final results = await Future.wait([
-        _search.searchTopics(query),
-        _search.api.searchImages(query),
+        _commons.searchTopics(query),
+        _commons.searchImages(query),
       ]);
 
       if (mounted) {
         setState(() {
-          _searchResults = results[0] as List<Topic>;
+          _searchResults = results[0] as List<WikipediaTopic>;
           _imageResults = results[1] as List<CommonsImage>;
           _isLoading = false;
         });
@@ -86,11 +86,12 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  void _handleTopicSelected(Topic topic) {
+  void _handleTopicSelected(WikipediaTopic topic) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => TopicDetailsPage(
           topic: topic,
+          commons: _commons,
         ),
       ),
     );
@@ -146,7 +147,7 @@ class _SearchScreenState extends State<SearchScreen> {
               MaterialPageRoute(
                 builder: (context) => ImageDetailPage(
                   image: image,
-                  topic: const Topic(
+                  topic: const WikipediaTopic(
                     id: 'search',
                     title: 'Search Results',
                     description: '',
@@ -155,7 +156,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     size: 0,
                     imageCount: 0,
                   ),
-                  search: _search,
+                  commons: _commons,
                 ),
               ),
             );
@@ -167,23 +168,16 @@ class _SearchScreenState extends State<SearchScreen> {
                 color: Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: image.url != null || image.thumbUrl != null
-                  ? Image.network(
-                      image.thumbUrl ?? image.url!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Center(
-                        child: Icon(
-                          Icons.error_outline,
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
-                    )
-                  : Center(
-                      child: Icon(
-                        Icons.image_not_supported_outlined,
-                        color: Colors.grey.shade400,
-                      ),
-                    ),
+              child: Image.network(
+                image.thumbUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Icon(
+                    Icons.error_outline,
+                    color: Colors.grey.shade400,
+                  ),
+                ),
+              ),
             ),
           ),
         );

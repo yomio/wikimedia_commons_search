@@ -4,7 +4,7 @@ import 'package:wikimedia_commons_search/wikimedia_commons_search.dart';
 void main() {
   group('Topic', () {
     test('creates instance with required parameters', () {
-      final topic = Topic(
+      final topic = WikipediaTopic(
         id: '123',
         title: 'Test Topic',
         description: 'Test description',
@@ -33,7 +33,7 @@ void main() {
         'imageCount': 10,
       };
 
-      final topic = Topic.fromJson(json);
+      final topic = WikipediaTopic.fromJson(json);
 
       expect(topic.id, '123');
       expect(topic.title, 'Test Topic');
@@ -47,7 +47,7 @@ void main() {
     test('handles missing values in JSON', () {
       final json = {'id': '123'};
 
-      final topic = Topic.fromJson(json);
+      final topic = WikipediaTopic.fromJson(json);
 
       expect(topic.id, '123');
       expect(topic.title, 'Untitled');
@@ -62,7 +62,7 @@ void main() {
     });
 
     test('converts to JSON', () {
-      final topic = Topic(
+      final topic = WikipediaTopic(
         id: '123',
         title: 'Test Topic',
         description: 'Test description',

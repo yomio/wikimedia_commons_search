@@ -91,13 +91,51 @@ MockClient createMockClient() {
                     'thumburl': 'https://example.com/Eiffel_Tower_thumb.jpg',
                     'width': 1920,
                     'height': 1080,
+                    'size': 1024 * 1024, // 1MB file size
                     'mime': 'image/jpeg',
+                    'mediatype': 'BITMAP',
                     'descriptionurl': 'https://commons.wikimedia.org/wiki/File:Eiffel_Tower.jpg',
                     'extmetadata': {
                       'ImageDescription': {'value': 'The Eiffel Tower at night'},
-                      'License': {'value': 'CC BY-SA 4.0'},
+                      'LicenseShortName': {'value': 'CC BY-SA 4.0'},
+                      'Artist': {
+                        'value':
+                            'User:JohnDoe [[User:JohnDoe|John Doe]] https://commons.wikimedia.org/wiki/User:JohnDoe'
+                      },
                       'Attribution': {'value': 'Photo by John Doe'},
+                      'GPSLatitude': {'value': '48.8584'},
+                      'GPSLongitude': {'value': '2.2945'},
                     }
+                  }
+                ]
+              },
+              '457': {
+                'pageid': 457,
+                'title': 'File:commons-logo.svg',
+                'imageinfo': [
+                  {
+                    'url': 'https://example.com/commons-logo.svg',
+                    'thumburl': 'https://example.com/commons-logo_thumb.svg',
+                    'width': 100,
+                    'height': 100,
+                    'size': 1024,
+                    'mime': 'image/svg+xml',
+                    'mediatype': 'DRAWING',
+                  }
+                ]
+              },
+              '458': {
+                'pageid': 458,
+                'title': 'File:Star_full.svg',
+                'imageinfo': [
+                  {
+                    'url': 'https://example.com/Star_full.svg',
+                    'thumburl': 'https://example.com/Star_full_thumb.svg',
+                    'width': 100,
+                    'height': 100,
+                    'size': 1024,
+                    'mime': 'image/svg+xml',
+                    'mediatype': 'DRAWING',
                   }
                 ]
               }

@@ -3,11 +3,13 @@ import 'package:wikimedia_commons_search/wikimedia_commons_search.dart';
 import 'image_detail_page.dart';
 
 class TopicDetailsPage extends StatefulWidget {
-  final Topic topic;
+  final WikipediaTopic topic;
+  final WikimediaCommons commons;
 
   const TopicDetailsPage({
     super.key,
     required this.topic,
+    required this.commons,
   });
 
   @override
@@ -24,10 +26,7 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
   }
 
   void _loadImages() {
-    final search = WikimediaCommonsSearch();
-    _imagesFuture = search.getTopicImages(widget.topic.id).whenComplete(() {
-      search.dispose();
-    });
+    _imagesFuture = widget.commons.getTopicImages(widget.topic.id);
   }
 
   @override
@@ -105,18 +104,15 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                   final image = images[index];
                   return InkWell(
                     onTap: () {
-                      final search = WikimediaCommonsSearch();
-                      Navigator.of(context)
-                          .push(
-                            MaterialPageRoute(
-                              builder: (context) => ImageDetailPage(
-                                image: image,
-                                topic: widget.topic,
-                                search: search,
-                              ),
-                            ),
-                          )
-                          .whenComplete(() => search.dispose());
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ImageDetailPage(
+                            image: image,
+                            topic: widget.topic,
+                            commons: widget.commons,
+                          ),
+                        ),
+                      );
                     },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
@@ -125,23 +121,16 @@ class _TopicDetailsPageState extends State<TopicDetailsPage> {
                           color: Colors.grey.shade200,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: image.url != null || image.thumbUrl != null
-                            ? Image.network(
-                                image.thumbUrl ?? image.url!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) => Center(
-                                  child: Icon(
-                                    Icons.error_outline,
-                                    color: Colors.grey.shade400,
-                                  ),
-                                ),
-                              )
-                            : Center(
-                                child: Icon(
-                                  Icons.image_not_supported_outlined,
-                                  color: Colors.grey.shade400,
-                                ),
-                              ),
+                        child: Image.network(
+                          image.thumbUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Center(
+                            child: Icon(
+                              Icons.error_outline,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   );

@@ -1,13 +1,15 @@
-/// A library for searching Wikimedia Commons images through Wikipedia topics.
+/// A library for accessing Wikimedia Commons images and Wikipedia content.
 ///
-/// This library provides HTTP client functionality to search and retrieve content
-/// from Wikipedia's API and Wikimedia Commons. It handles network requests,
-/// API integration, and search functionality for Wikipedia articles and images.
+/// This library provides functionality to:
+/// - Search Wikipedia topics and retrieve their images
+/// - Search Wikimedia Commons images directly
+/// - Get detailed image information and metadata
+/// - Generate thumbnail URLs for Wikimedia images
 ///
-/// Topics: http, api, network, search, wikipedia
+/// Topics: http, api, network, search, wikipedia, wikimedia, commons
 library wikimedia_commons_search;
 
-export 'src/wikimedia_commons_search_base.dart';
+export 'src/wikimedia_commons.dart';
 export 'src/models/topic.dart';
 export 'src/models/commons_image.dart';
 export 'src/exceptions.dart';

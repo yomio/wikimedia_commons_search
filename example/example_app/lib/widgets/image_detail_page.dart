@@ -4,14 +4,14 @@ import 'package:wikimedia_commons_search/wikimedia_commons_search.dart';
 
 class ImageDetailPage extends StatefulWidget {
   final CommonsImage image;
-  final Topic topic;
-  final WikimediaCommonsSearch search;
+  final WikipediaTopic topic;
+  final WikimediaCommons commons;
 
   const ImageDetailPage({
     super.key,
     required this.image,
     required this.topic,
-    required this.search,
+    required this.commons,
   });
 
   @override
@@ -30,7 +30,7 @@ class _ImageDetailPageState extends State<ImageDetailPage> {
 
   Future<void> _loadImageDetails() async {
     try {
-      final details = await widget.search.api.getImageInfo(widget.image.fullTitle);
+      final details = await widget.commons.getImageInfo(widget.image.fullTitle);
       if (mounted && details != null) {
         setState(() {
           _imageDetails = details;
@@ -91,31 +91,6 @@ class _ImageDetailPageState extends State<ImageDetailPage> {
     );
   }
 
-  Widget _buildMetadata(BuildContext context, String label, String? value) {
-    if (value == null || value.isEmpty) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(value),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,7 +102,7 @@ class _ImageDetailPageState extends State<ImageDetailPage> {
                   icon: const Icon(Icons.copy),
                   tooltip: 'Copy image URL',
                   onPressed: () async {
-                    final url = _imageDetails!.url!;
+                    final url = _imageDetails!.url;
                     await Clipboard.setData(ClipboardData(text: url));
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -154,7 +129,7 @@ class _ImageDetailPageState extends State<ImageDetailPage> {
                         color: Colors.grey.shade200,
                         child: Center(
                           child: Image.network(
-                            _imageDetails!.url!,
+                            _imageDetails!.url,
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) => Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -182,27 +157,154 @@ class _ImageDetailPageState extends State<ImageDetailPage> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildMetadata(context, 'From', widget.topic.title),
-                          _buildMetadata(context, 'Description', _imageDetails!.description),
-                          _buildMetadata(context, 'License', _imageDetails!.license),
-                          _buildMetadata(context, 'Attribution', _imageDetails!.attribution),
-                          _buildMetadata(
-                            context,
-                            'Size',
-                            '${_imageDetails!.width} × ${_imageDetails!.height} pixels',
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, -2),
                           ),
-                          _buildMetadata(context, 'Type', _imageDetails!.mimeType),
                         ],
+                      ),
+                      constraints: const BoxConstraints(maxHeight: 200),
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Description and source
+                            if (_imageDetails!.description != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Text(
+                                  _imageDetails!.description!,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+
+                            // Main metadata grid
+                            SizedBox(
+                              width: double.infinity,
+                              child: Wrap(
+                                spacing: 24,
+                                runSpacing: 12,
+                                children: [
+                                  // Author info
+                                  if (_imageDetails!.artistName != null)
+                                    _buildMetadataColumn(
+                                      context,
+                                      'Author',
+                                      _imageDetails!.artistName!,
+                                      url: _imageDetails!.artistUrl,
+                                    ),
+
+                                  // License
+                                  if (_imageDetails!.license != null)
+                                    _buildMetadataColumn(
+                                      context,
+                                      'License',
+                                      _imageDetails!.license!,
+                                    ),
+
+                                  // Technical details
+                                  _buildMetadataColumn(
+                                    context,
+                                    'Dimensions',
+                                    '${_imageDetails!.width} × ${_imageDetails!.height}',
+                                    subtitle: _imageDetails!.fileSize != null
+                                        ? _formatFileSize(_imageDetails!.fileSize!)
+                                        : null,
+                                  ),
+
+                                  // Location
+                                  if (_imageDetails!.latitude != null && _imageDetails!.longitude != null)
+                                    _buildMetadataColumn(
+                                      context,
+                                      'Location',
+                                      '${_imageDetails!.latitude!.toStringAsFixed(4)}, ${_imageDetails!.longitude!.toStringAsFixed(4)}',
+                                      url:
+                                          'https://www.openstreetmap.org/?mlat=${_imageDetails!.latitude}&mlon=${_imageDetails!.longitude}&zoom=15',
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
     );
+  }
+
+  Widget _buildMetadataColumn(
+    BuildContext context,
+    String label,
+    String value, {
+    String? url,
+    String? subtitle,
+  }) {
+    return SizedBox(
+      width: 160,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: 4),
+          if (url != null)
+            InkWell(
+              onTap: () async {
+                final data = ClipboardData(text: url);
+                await Clipboard.setData(data);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('$label URL copied to clipboard'),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              child: Text(
+                value,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
+              ),
+            )
+          else
+            Text(
+              value,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 }
