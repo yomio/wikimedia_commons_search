@@ -1,6 +1,56 @@
 import 'package:equatable/equatable.dart';
 
-/// Represents an image from Wikimedia Commons with its metadata
+/// Represents an image from Wikimedia Commons with its metadata.
+///
+/// This class encapsulates all the information about a Wikimedia Commons image,
+/// including its metadata, dimensions, license information, and attribution details.
+///
+/// Example usage:
+/// ```dart
+/// final image = CommonsImage(
+///   title: 'Example.jpg',
+///   fullTitle: 'File:Example.jpg',
+///   url: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Example.jpg',
+///   thumbUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Example.jpg/800px-Example.jpg',
+///   width: 1920,
+///   height: 1080,
+///   mimeType: 'image/jpeg',
+/// );
+///
+/// // Access image properties
+/// print('Title: ${image.title}');
+/// print('URL: ${image.url}');
+/// print('Dimensions: ${image.width}x${image.height}');
+/// ```
+///
+/// ## Properties
+///
+/// ### Required Properties
+/// - [title]: The file name without the 'File:' prefix
+/// - [fullTitle]: The complete file title including the 'File:' prefix
+/// - [url]: The full URL to the original image
+/// - [thumbUrl]: The URL to a thumbnail version of the image
+/// - [width]: The width of the image in pixels
+/// - [height]: The height of the image in pixels
+/// - [mimeType]: The MIME type of the image (e.g., 'image/jpeg')
+///
+/// ### Optional Properties
+/// - [description]: A description of the image content
+/// - [license]: The license under which the image is available
+/// - [licenseUrl]: URL to the full license text
+/// - [artistName]: The name of the image creator
+/// - [artistUrl]: URL to the artist's page
+/// - [attribution]: Attribution text required by the license
+/// - [latitude]: Geographic latitude where the image was taken
+/// - [longitude]: Geographic longitude where the image was taken
+/// - [fileSize]: Size of the image file in bytes
+/// - [priority]: Internal priority for sorting (default: 0)
+///
+/// ## JSON Serialization
+///
+/// The class provides [fromJson] factory constructor for creating instances
+/// from JSON data. Required fields must be present in the JSON, or a
+/// [FormatException] will be thrown.
 class CommonsImage extends Equatable {
   /// Creates a new CommonsImage instance
   const CommonsImage({
@@ -74,55 +124,55 @@ class CommonsImage extends Equatable {
     );
   }
 
-  /// The title of the image without the 'File:' prefix
+  /// The file name without the 'File:' prefix
   final String title;
 
-  /// The full title of the image including the 'File:' prefix
+  /// The complete file title including the 'File:' prefix
   final String fullTitle;
 
-  /// Direct URL to the full image
+  /// The full URL to the original image
   final String url;
 
-  /// URL to a thumbnail version of the image
+  /// The URL to a thumbnail version of the image
   final String thumbUrl;
 
-  /// Original image width in pixels
+  /// The width of the image in pixels
   final int width;
 
-  /// Original image height in pixels
+  /// The height of the image in pixels
   final int height;
 
-  /// Image MIME type (e.g., 'image/jpeg')
+  /// The MIME type of the image (e.g., 'image/jpeg')
   final String mimeType;
 
-  /// Image description from Commons
+  /// A description of the image content
   final String? description;
 
-  /// Image license information (e.g., "CC BY-SA 4.0")
+  /// The license under which the image is available
   final String? license;
 
-  /// URL to the license details
+  /// URL to the full license text
   final String? licenseUrl;
 
-  /// Name of the artist/creator
+  /// The name of the image creator
   final String? artistName;
 
   /// URL to the artist's page
   final String? artistUrl;
 
-  /// Image attribution information
+  /// Attribution text required by the license
   final String? attribution;
 
-  /// Latitude of the location where the image was taken (if available)
+  /// Geographic latitude where the image was taken
   final double? latitude;
 
-  /// Longitude of the location where the image was taken (if available)
+  /// Geographic longitude where the image was taken
   final double? longitude;
 
   /// Size of the image file in bytes
   final int? fileSize;
 
-  /// Internal priority for sorting (not included in JSON)
+  /// Internal priority for sorting (default: 0)
   final int priority;
 
   @override

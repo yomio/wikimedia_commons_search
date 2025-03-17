@@ -51,8 +51,45 @@ import 'exceptions.dart';
 /// commons.dispose();
 /// ```
 ///
-/// The class automatically manages HTTP connections and should be disposed of
-/// when no longer needed using the [dispose] method.
+/// ## Methods
+///
+/// ### searchTopics
+/// Searches for Wikipedia topics based on a query string.
+/// Returns a list of [Topic] objects sorted by relevance.
+/// Throws [WikimediaNoResultsException] if no topics are found.
+///
+/// ### getTopicImages
+/// Retrieves images associated with a specific topic ID.
+/// Returns a list of [CommonsImage] objects.
+/// Throws [WikimediaNoImagesException] if no suitable images are found.
+///
+/// ### searchImages
+/// Searches for images directly on Wikimedia Commons.
+/// Returns a list of [CommonsImage] objects sorted by relevance.
+/// Throws [WikimediaNoResultsException] if no images are found.
+///
+/// ### getThumbnailUrl
+/// Static method to generate a thumbnail URL for any Wikimedia image.
+/// Supports width specification and automatic format conversion.
+///
+/// ## Error Handling
+///
+/// All methods can throw:
+/// - [WikimediaApiException] for API-related errors
+/// - [ResponseParsingException] for malformed responses
+/// - [DisposedException] when using a disposed instance
+///
+/// ## Disposal
+///
+/// Always call [dispose] when you're done using the instance to free up resources:
+/// ```dart
+/// final commons = WikimediaCommons();
+/// try {
+///   // Use the instance...
+/// } finally {
+///   commons.dispose();
+/// }
+/// ```
 class WikimediaCommons {
   /// Creates a new instance of WikimediaCommons
   ///
