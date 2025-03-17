@@ -3,6 +3,7 @@
 [![pub topics](https://img.shields.io/badge/pub%20topics-http,api,network,search,wikipedia-blue)](https://pub.dev/packages/wikimedia_commons_search)
 
 A Dart library for searching Wikipedia topics and retrieving associated Wikimedia Commons images.
+wikimedia_commons_search is developed and used by [Faabul Live Quizzes][faabul_link]
 
 ## ⚠️ Licensing Notice
 
@@ -32,11 +33,11 @@ dart pub get
 import 'package:wikimedia_commons_search/wikimedia_commons_search.dart';
 
 void main() async {
-  final search = WikimediaCommonsSearch();
+  final commons = WikimediaCommons();
 
   try {
     // Search for images related to a topic
-    final images = await search.searchImages('Eiffel Tower');
+    final images = await commons.searchImages('Eiffel Tower');
     
     for (final image in images) {
       print('Title: ${image.title}');
@@ -48,7 +49,7 @@ void main() async {
   } on WikimediaCommonsException catch (e) {
     print('Error: ${e.message}');
   } finally {
-    search.dispose();
+    commons.dispose();
   }
 }
 ```
@@ -68,11 +69,11 @@ Here's how the library looks in action using the bundled example Flutter app (se
 You can also search for topics first and then get images for specific topics:
 
 ```dart
-final search = WikimediaCommonsSearch();
+final commons = WikimediaCommons();
 
 try {
   // Search for Wikipedia topics
-  final topics = await search.searchTopics('Eiffel Tower');
+  final topics = await commons.searchTopics('Eiffel Tower');
   
   // Print topic information
   for (final topic in topics) {
@@ -80,7 +81,7 @@ try {
     print('Description: ${topic.description}');
     
     // Get images for this specific topic
-    final images = await search.getTopicImages(topic.id);
+    final images = await commons.getTopicImages(topic.id);
     print('Found ${images.length} images');
     
     for (final image in images) {
@@ -89,22 +90,45 @@ try {
     print('---');
   }
 } finally {
-  search.dispose();
+  commons.dispose();
 }
+```
+
+### Thumbnail Generation
+
+```dart
+final thumbUrl = WikimediaCommons.getThumbnailUrl(
+  'https://upload.wikimedia.org/wikipedia/commons/a/a5/Example.jpg',
+  width: 800,
+);
 ```
 
 ## Features
 
-- Search for images related to Wikipedia topics
-- Browse and filter high-quality Wikimedia Commons images
-- Get detailed image metadata:
+- **Topic Search**
+  - Search Wikipedia topics by keywords
+  - Get topic metadata (title, description, word count, size)
+  - Sorted by relevance
+
+- **Image Search**
+  - Search images directly on Wikimedia Commons
+  - Get images associated with Wikipedia topics
+  - Smart filtering of utility images (flags, icons, logos)
+  - Automatic sorting by size and relevance
+
+- **Image Metadata**
   - Full resolution URL and thumbnail
   - Description and attribution
   - License information
   - Technical details (dimensions, file type)
-- Automatic filtering of utility images (flags, icons, logos)
-- Smart image sorting (non-SVG before SVG, larger files first)
-- Comprehensive error handling with custom exceptions
+  - GPS coordinates (when available)
+  - Artist information
+  - File size
+
+- **Thumbnail Generation**
+  - Generate thumbnail URLs for any Wikimedia image
+  - Automatic format conversion (SVG to PNG, etc.)
+  - Aspect ratio preservation
 
 ## Error Handling
 
@@ -117,6 +141,8 @@ The library provides several exception types for different error cases:
 
 ## License
 
-This library is licensed under the MIT License - see the LICENSE file for details.
+This library is licensed under the BSD 3-Clause License - see the LICENSE file for details.
 
 Note: This license applies to the library code only, not to the content retrieved from Wikimedia Commons or Wikipedia.
+
+[faabul_link]: https://faabul.com
